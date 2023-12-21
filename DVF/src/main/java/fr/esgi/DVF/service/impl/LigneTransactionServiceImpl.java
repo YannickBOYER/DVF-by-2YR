@@ -30,7 +30,7 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
             CSVRecord csvRecord = null;
             URL url = new URL(csvDataUrlPath);
 
-            InputStreamReader reader = new InputStreamReader(new BufferedInputStream(url.openStream()));
+            Reader reader = new InputStreamReader(new BufferedInputStream(url.openStream()));
 
             CSVParser csvParser = new CSVParser(reader, csvFormat);
             while(csvParser.iterator().hasNext()){
