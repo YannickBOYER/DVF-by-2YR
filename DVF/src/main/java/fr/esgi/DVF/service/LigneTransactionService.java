@@ -1,2 +1,5 @@
-package fr.esgi.DVF.service.impl;public interface LigneTransactionService {
+package fr.esgi.DVF.service;
+
+public interface LigneTransactionService{
+    public void importer();
 }
