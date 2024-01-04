@@ -18,11 +18,15 @@ import java.util.zip.GZIPInputStream;
 @Service
 public class LigneTransactionServiceImpl implements LigneTransactionService {
     private LigneTransactionRepository ligneTransactionRepository;
-    private final String csvCompresedFileUrlPath = "https://files.data.gouv.fr/geo-dvf/latest/csv/2023/full.csv.gz";
-    private CSVParser csvParser;
-    private int tailleInterval = 5000;
 
+    private final String csvCompresedFileUrlPath = "https://files.data.gouv.fr/geo-dvf/latest/csv/2023/full.csv.gz";
     private final String localFilePath = "doc/csv/full.csv";
+    private CSVParser csvParser;
+
+    private final int tailleInterval = 100000;
+    private int nbrLigneIgnoree;
+    private boolean isImportTermine = false;
+
 
     public LigneTransactionServiceImpl(LigneTransactionRepository ligneTransactionRepository){
         try{
@@ -37,23 +41,33 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         return ligneTransactionRepository.count();
     }
 
-    @Scheduled(cron = "*/15 * * * * *")
+    @Scheduled(cron = "*/30 * * * * *")
+    //@Scheduled(cron = "0 */5 * * * *")
     public void importer() {
         try{
-            if(csvParser.iterator().hasNext()){
-                // On insère les lignes csv
-                for (int i = 0; i < tailleInterval; i++){
-                    if(csvParser.iterator().hasNext()){
-                        CSVRecord csvRecord = csvParser.iterator().next();
-                        importerLigneTransactionByCSVRecord(csvRecord);
+            if(!isImportTermine){
+                if(csvParser.iterator().hasNext()){
+                    System.out.println("Importation de 100 000 lignes en base H2...");
+                    for (int i = 0; i < tailleInterval; i++){
+                        if(csvParser.iterator().hasNext()){
+                            CSVRecord csvRecord = csvParser.iterator().next();
+                            importerLigneTransactionByCSVRecord(csvRecord);
+                        }
                     }
+                }else{
+                    resultatImport();
+                    isImportTermine = true;
                 }
-            }else{
-                System.out.println("L'ensemble des lignes on été importées.");
             }
         }catch (Exception exception){
             exception.printStackTrace();
         }
+    }
+
+    private void resultatImport(){
+        System.out.println("L'ensemble des lignes ont été importées.");
+        System.out.println("Lignes importées : " + this.getNombreDeLignes() + ".");
+        System.out.println("Lignes ignorées : " + this.nbrLigneIgnoree + ".");
     }
 
     private void importerLigneTransactionByCSVRecord(CSVRecord csvRecord) throws Exception{
@@ -62,11 +76,17 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
 
         String idMutation = csvRecord.get("id_mutation");
         Date dateMutation = dateFormat.parse(csvRecord.get("date_mutation"));
-        double longitude = Double.parseDouble(csvRecord.get("longitude"));
-        double latitude = Double.parseDouble(csvRecord.get("latitude"));
 
-        ligneTransaction = new LigneTransaction(idMutation, dateMutation, longitude, latitude);
-        ligneTransactionRepository.save(ligneTransaction);
+        // Si les lignes n'ont pas de longitude/latitude on ne les prends pas (sert a rien)
+        if(!csvRecord.get("longitude").isEmpty() && !csvRecord.get("latitude").isEmpty()){
+            double longitude = Double.parseDouble(csvRecord.get("longitude"));
+            double latitude = Double.parseDouble(csvRecord.get("latitude"));
+
+            ligneTransaction = new LigneTransaction(idMutation, dateMutation, longitude, latitude);
+            ligneTransactionRepository.save(ligneTransaction);
+        }else{
+            nbrLigneIgnoree++;
+        }
     }
 
     private CSVParser getCSVParser() throws Exception{
