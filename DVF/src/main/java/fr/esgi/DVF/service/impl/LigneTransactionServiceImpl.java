@@ -1,61 +1,94 @@
 package fr.esgi.DVF.service.impl;
 
+import fr.esgi.DVF.business.LigneTransaction;
+import fr.esgi.DVF.repository.LigneTransactionRepository;
 import fr.esgi.DVF.service.LigneTransactionService;
-import lombok.AllArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.zip.GZIPInputStream;
 
 @Service
-@AllArgsConstructor
 public class LigneTransactionServiceImpl implements LigneTransactionService {
-    private final String csvDataUrlPath = "http://www.data.gouv.fr/fr/datasets/r/316795eb-a3fa-465d-b058-38ef8579da11";
-    private final CSVFormat csvFormat = CSVFormat.newFormat(',').builder().setHeader().setSkipHeaderRecord(true).build();
+    private LigneTransactionRepository ligneTransactionRepository;
+    private final String csvCompresedFileUrlPath = "https://files.data.gouv.fr/geo-dvf/latest/csv/2023/full.csv.gz";
+    private CSVParser csvParser;
+    private int tailleInterval = 5000;
 
-    @Override
-    public void importer() {
+    private final String localFilePath = "doc/csv/full.csv";
+
+    public LigneTransactionServiceImpl(LigneTransactionRepository ligneTransactionRepository){
         try{
-            CSVParser csvParser = getCSVParser();
-            int lineNumber = 0;
-            while (csvParser.iterator().hasNext()){
-                lineNumber++;
-                CSVRecord csvRecord = csvParser.iterator().next();
-                System.out.println(csvRecord);
-
-                // On prend les 15 premère ligne pour le moments
-                if(lineNumber == 15){
-                    break;
-                }
-            }
-            csvParser.close();
+            this.ligneTransactionRepository = ligneTransactionRepository;
+            this.csvParser = getCSVParser();
         }catch (Exception exception){
             System.out.println(exception.getMessage());
         }
-
     }
 
-    private CSVParser getCSVParser()throws Exception{
-        CSVParser csvParser = null;
-        Reader reader = null;
+    public Long getNombreDeLignes(){
+        return ligneTransactionRepository.count();
+    }
 
-        // Tentative de récupération par URL
-        URL url = new URL(csvDataUrlPath);
-        reader = new InputStreamReader(new BufferedInputStream(url.openStream()));
+    @Scheduled(cron = "*/15 * * * * *")
+    public void importer() {
+        try{
+            if(csvParser.iterator().hasNext()){
+                // On insère les lignes csv
+                for (int i = 0; i < tailleInterval; i++){
+                    if(csvParser.iterator().hasNext()){
+                        CSVRecord csvRecord = csvParser.iterator().next();
+                        importerLigneTransactionByCSVRecord(csvRecord);
+                    }
+                }
+            }else{
+                System.out.println("L'ensemble des lignes on été importées.");
+            }
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+    }
 
-        csvParser = new CSVParser(reader, csvFormat);
-        // Si la liste d'enregistrement du csvParser est vide,
-        // on tente de faire une extraction par fichier
-        if(!csvParser.getRecords().isEmpty()){
-            return csvParser;
-        }else{
-            File file = new File("C:\\Users\\robin\\Documents\\ESGI\\archi\\dvf\\file\\full.csv");
-            reader = new InputStreamReader(new BufferedInputStream(file.toURL().openStream()));
+    private void importerLigneTransactionByCSVRecord(CSVRecord csvRecord) throws Exception{
+        LigneTransaction ligneTransaction;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-            return new CSVParser(reader, csvFormat);
+        String idMutation = csvRecord.get("id_mutation");
+        Date dateMutation = dateFormat.parse(csvRecord.get("date_mutation"));
+        double longitude = Double.parseDouble(csvRecord.get("longitude"));
+        double latitude = Double.parseDouble(csvRecord.get("latitude"));
+
+        ligneTransaction = new LigneTransaction(idMutation, dateMutation, longitude, latitude);
+        ligneTransactionRepository.save(ligneTransaction);
+    }
+
+    private CSVParser getCSVParser() throws Exception{
+        downloadAndDecompressGzip();
+        File file = new File(localFilePath);
+        Reader reader = new InputStreamReader(new BufferedInputStream(file.toURL().openStream()));
+        CSVFormat csvFormat = CSVFormat.newFormat(',').builder().setHeader().setSkipHeaderRecord(true).build();
+        return new CSVParser(reader, csvFormat);
+    }
+
+    private void downloadAndDecompressGzip() throws IOException {
+        URL url = new URL(csvCompresedFileUrlPath);
+
+        try (InputStream in = url.openStream();
+             GZIPInputStream gzipIn = new GZIPInputStream(in);
+             FileOutputStream out = new FileOutputStream(localFilePath)) {
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = gzipIn.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
         }
     }
 }

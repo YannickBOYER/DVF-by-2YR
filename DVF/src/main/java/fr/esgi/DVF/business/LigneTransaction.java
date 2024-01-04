@@ -17,7 +17,18 @@ public class LigneTransaction {
     @GeneratedValue
     private Long id;
 
-    private Long idMutation;
+    private String idMutation;
 
     private Date dateMutation;
+
+    private double longitude;
+
+    private double latitude;
+
+    public LigneTransaction(String idMutation, Date dateMutation, double longitude, double latitude) {
+        this.idMutation = idMutation;
+        this.dateMutation = dateMutation;
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
 }
