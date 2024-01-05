@@ -25,18 +25,21 @@ const center = [ 4.83242748730953,45.76024989812256]; // Coordonnées de Lyon, p
 const handleSubmitForm = (formData) => {
   console.log('formData', formData);
     // Use Axios or another HTTP library to send a POST request
-    axios.post('http://localhost:8080/LigneTransaction/location', {
+    axios.get('http://localhost:8080/LigneTransaction/generatePdfByLocation', {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
         longitude: formData.longitude,
         latitude: formData.latitude,
         rayon: formData.radius
+      }
     })
     .then(response => {
         console.log(response.data);
-        // Handle success if needed
     })
     .catch(error => {
         console.error(error);
-        // Handle error if needed
     });
 };
 
