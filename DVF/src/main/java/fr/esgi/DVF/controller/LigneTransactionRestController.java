@@ -4,10 +4,7 @@ import fr.esgi.DVF.dto.LocationDTO;
 import fr.esgi.DVF.service.LigneTransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -29,5 +26,16 @@ public class LigneTransactionRestController {
         Long nbrLignesImportees = ligneTransactionService.getNombreDeLignes();
         return ResponseEntity.ok(nbrLignesImportees + " lignes ont été importées.");
     }
+
+    @PostMapping("location")
+    public ResponseEntity<String> postLocation (@RequestBody LocationDTO locationDTO){
+        System.out.println(locationDTO.longitude);
+        System.out.println(locationDTO.latitude);
+        System.out.println(locationDTO.rayon);
+        // Ici, définir les actions à réaliser avec la location récupérée
+        generatePdfByLocation(locationDTO);
+        return ResponseEntity.ok("Localisation récupérée");
+    }
+
 }
 

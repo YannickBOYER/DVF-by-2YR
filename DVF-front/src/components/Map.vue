@@ -6,16 +6,13 @@
     </header>
     <div ref="mapContainer" class="map-container" />
     <HelloWorld
-      @submit-form="handleSubmitForm"
-      :longitude= longitude
-      :latitude= latitude
-      :radius=radius*1000
+      @submitForm="handleSubmitForm"
     />
 </template>
 
 <div id="map"></div>
 <script setup>
-
+import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -25,6 +22,24 @@ const map = ref(null);
 const mapContainer = ref(null);
 const center = [ 4.83242748730953,45.76024989812256]; // Coordonnées de Lyon, par exemple
 
+const handleSubmitForm = (formData) => {
+  console.log('formData', formData);
+    // Use Axios or another HTTP library to send a POST request
+    axios.post('http://localhost:8080/LigneTransaction/location', {
+        longitude: formData.longitude,
+        latitude: formData.latitude,
+        rayon: formData.radius
+    })
+    .then(response => {
+        console.log(response.data);
+        // Handle success if needed
+    })
+    .catch(error => {
+        console.error(error);
+        // Handle error if needed
+    });
+};
+
 onMounted(() => {
   map.value = new maplibregl.Map({
     container: mapContainer.value,
@@ -33,7 +48,6 @@ onMounted(() => {
     zoom: 13
   })
 });
-
 
 
 // const setCircle = (radius, longitude, latitude) => {

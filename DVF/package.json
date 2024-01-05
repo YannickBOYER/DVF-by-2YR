@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "vue": "^3.3.13",
+    "vue-cli": "^2.9.6",
+    "vue-router": "^4.2.5"
+  }
+}

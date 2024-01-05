@@ -13,9 +13,9 @@
   
   <form @submit.prevent="handleSubmit" class="mx-auto p-6 bg-white rounded-lg shadow-md max-w-lg flex gap-2 flex-col flexbox">
     <label for="longitude">Longitude : </label>
-    <input type="number" v-model="longitude" placeholder="longitude">
+    <input type="number" v-model="longitude" placeholder="longitude" step="any">
     <label for="latitude">Latitude : </label>
-    <input type="number" v-model="latitude" placeholder="latitude">
+    <input type="number" v-model="latitude" placeholder="latitude" step="any">
     <label for="radius">Radius (meters) : </label>
     <input type="number" v-model="radius" placeholder="radius">
     <button type="submit">Validate</button>
@@ -31,10 +31,13 @@ const latitude = ref('');
 const radius = ref('');
 
 const emit = defineEmits<{
-  (event: 'submitForm', {  } ): void
+  (event: 'submitForm' , {} ): void
 }>()
 
 const handleSubmit = () => {
+  console.log(longitude.value);
+  console.log(latitude.value);
+  console.log(radius.value);
   emit('submitForm', {longitude: longitude.value, latitude: latitude.value, radius: radius.value})
 };
 
