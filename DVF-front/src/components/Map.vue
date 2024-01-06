@@ -24,15 +24,15 @@ const center = [ 4.83242748730953,45.76024989812256]; // Coordonnées de Lyon, p
 
 const handleSubmitForm = (formData) => {
   console.log('formData', formData);
-    // Use Axios or another HTTP library to send a POST request
-    axios.get('http://localhost:8080/LigneTransaction/generatePdfByLocation', {
+    // Use Axios or another HTTP library to send a GET request
+    axios.get('http://localhost:8080/LigneTransaction/generatePdfByLocationParam', {
       headers: {
         'Content-Type': 'application/json'
       },
-      data: {
-        longitude: formData.longitude,
-        latitude: formData.latitude,
-        rayon: formData.radius
+      params: {
+        "longitude": formData.longitude,
+        "latitude": formData.latitude,
+        "rayon": formData.radius
       }
     })
     .then(response => {
@@ -46,7 +46,7 @@ const handleSubmitForm = (formData) => {
 onMounted(() => {
   map.value = new maplibregl.Map({
     container: mapContainer.value,
-    style: 'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL', // Utilisez votre propre style si nécessaire
+    style: 'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
     center: center,
     zoom: 13
   })

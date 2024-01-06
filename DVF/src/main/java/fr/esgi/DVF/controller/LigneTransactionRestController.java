@@ -26,6 +26,14 @@ public class LigneTransactionRestController {
         Long nbrLignesImportees = ligneTransactionService.getNombreDeLignes();
         return ResponseEntity.ok(nbrLignesImportees + " lignes ont été importées.");
     }
-    
+
+    @GetMapping("generatePdfByLocationParam")
+    public ModelAndView generatePdfByLocationParam(@RequestParam Double longitude, Double latitude, int rayon){
+        System.out.println("PDF généré avec succès pour la localisation : " + longitude + ", " + latitude);
+        ModelAndView mav = new ModelAndView(new DvfPdfView(), null);
+        return mav;
+    }
+
+
 }
 
