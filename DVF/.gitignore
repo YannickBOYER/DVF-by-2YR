@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### full.csv ###
-doc/csv
+doc/csv/full.csv
