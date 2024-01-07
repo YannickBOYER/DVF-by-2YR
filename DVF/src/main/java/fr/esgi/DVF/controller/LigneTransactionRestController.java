@@ -1,6 +1,7 @@
 package fr.esgi.DVF.controller;
 
 import fr.esgi.DVF.dto.LocationDTO;
+import fr.esgi.DVF.exception.MissingParamException;
 import fr.esgi.DVF.service.LigneTransactionService;
 import fr.esgi.DVF.view.DvfPdfView;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,9 @@ public class LigneTransactionRestController {
 
     @GetMapping("generatePdfByLocation")
     public ModelAndView generatePdfByLocation(@RequestBody LocationDTO locationDTO){
+        if (locationDTO.longitude == null || locationDTO.latitude == null || locationDTO.rayon == null) {
+            throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
+        }
         System.out.println("PDF généré avec succès pour la localisation : " + locationDTO.longitude + ", " + locationDTO.latitude);
         ModelAndView mav = new ModelAndView(new DvfPdfView(), null);
         return mav;
@@ -28,7 +32,10 @@ public class LigneTransactionRestController {
     }
 
     @GetMapping("generatePdfByLocationParam")
-    public ModelAndView generatePdfByLocationParam(@RequestParam Double longitude, Double latitude, int rayon){
+    public ModelAndView generatePdfByLocationParam(@RequestParam(name = "longitude", required = false) Double longitude, @RequestParam(name = "latitude", required = false) Double latitude, @RequestParam(name = "rayon", required = false) Integer rayon){
+        if (longitude == null || latitude == null || rayon == null) {
+            throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
+        }
         System.out.println("PDF généré avec succès pour la localisation : " + longitude + ", " + latitude);
         ModelAndView mav = new ModelAndView(new DvfPdfView(), null);
         return mav;
