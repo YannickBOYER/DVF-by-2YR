@@ -1,5 +1,6 @@
 package fr.esgi.DVF.controller;
 
+import fr.esgi.DVF.business.LigneTransaction;
 import fr.esgi.DVF.dto.LocationDTO;
 import fr.esgi.DVF.exception.MissingParamException;
 import fr.esgi.DVF.service.LigneTransactionService;
@@ -8,6 +9,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -36,11 +39,11 @@ public class LigneTransactionRestController {
         if (longitude == null || latitude == null || rayon == null) {
             throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
         }
+        Map<String, LigneTransaction> lignesTransactionByLocation = ligneTransactionService.getLigneTransactionByLocation(longitude, latitude, rayon);
         System.out.println("PDF généré avec succès pour la localisation : " + longitude + ", " + latitude);
-        ModelAndView mav = new ModelAndView(new DvfPdfView(), null);
+        ModelAndView mav = new ModelAndView(new DvfPdfView(), lignesTransactionByLocation);
         return mav;
     }
-
 
 }
 

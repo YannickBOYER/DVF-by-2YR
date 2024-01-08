@@ -1,6 +1,7 @@
 package fr.esgi.DVF.service.impl;
 
 import fr.esgi.DVF.business.LigneTransaction;
+import fr.esgi.DVF.dto.LocationDTO;
 import fr.esgi.DVF.repository.LigneTransactionRepository;
 import fr.esgi.DVF.service.LigneTransactionService;
 import org.apache.commons.csv.CSVFormat;
@@ -15,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
+import java.util.Map;
 
 @Service
 public class LigneTransactionServiceImpl implements LigneTransactionService {
@@ -36,6 +38,15 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
 
     public Long getNombreDeLignes(){
         return ligneTransactionRepository.count();
+    }
+
+    public Map<String, LigneTransaction> getLigneTransactionByLocation(LocationDTO locationDTO){
+        return getLigneTransactionByLocation(locationDTO.longitude, locationDTO.latitude, locationDTO.rayon);
+    }
+
+    public Map<String, LigneTransaction> getLigneTransactionByLocation(Double longitude, Double latitude, Integer rayon){
+        //TODO: calcul du rayon
+        return null;
     }
 
     @Scheduled(cron = "*/30 * * * * *")
