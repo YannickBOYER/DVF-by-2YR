@@ -20,7 +20,7 @@ import HelloWorld from './HelloWorld.vue'
 
 const map = ref(null);
 const mapContainer = ref(null);
-const center = [ 4.83242748730953,45.76024989812256]; // Coordonnées de Lyon, par exemple
+const center = [4.83242748730953,45.76024989812256]; // Coordonnées de Lyon, par exemple
 
 const handleSubmitForm = (formData) => {
   console.log('formData', formData);

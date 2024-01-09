@@ -14,6 +14,7 @@ import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 import java.util.Map;
@@ -45,8 +46,38 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     }
 
     public Map<String, LigneTransaction> getLigneTransactionByLocation(Double longitude, Double latitude, Integer rayon){
-        //TODO: calcul du rayon
-        return null;
+        Map<String, LigneTransaction> ligneTransactionMap = new HashMap<>();
+        int i = 0;
+        Double result;
+
+        for(LigneTransaction ligneTransaction : ligneTransactionRepository.findAll()){
+            result = calculateHaversineDistance(longitude, latitude, ligneTransaction.getLongitude(), ligneTransaction.getLatitude());
+            if (result <= rayon) {
+                System.out.println(i + ", distance: " + result + ", longitude: " + ligneTransaction.getLongitude() + ", latitude: " + ligneTransaction.getLatitude());
+                ligneTransactionMap.put(Integer.toString(i), ligneTransaction);
+                i++;
+            }
+        }
+        return ligneTransactionMap;
+    }
+
+    public static Double calculateHaversineDistance(Double longitude1, Double latitude1, Double longitude2, Double latitude2) {
+        final Integer r = 6371000; // Rayon de la terre en mètres
+
+        // Calcul de la distance de Haversine (Méthode utilisée pour trouver la distance entre 2 points géographiques)
+        Double latDistance = degToRad(latitude2 - latitude1);
+        Double lonDistance = degToRad(longitude2 - longitude1);
+        // Première partie du calcul (la partie intérieure de l'arc tangent)
+        Double a = Math.pow(Math.sin(latDistance/2),2) + Math.cos(degToRad(latitude1)) * Math.cos(degToRad(latitude2)) * Math.pow(Math.sin(lonDistance/2),2);
+        // Deuxième partie du calcul utilisant le résultat précédent
+        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        // On retourne le résultat du calcul multiplié par le rayon de la Terre afin d'avoir la distance en mètres entre les 2 points
+        return r * c;
+    }
+
+    public static Double degToRad(Double value) {
+        return value * Math.PI / 180;
     }
 
     @Scheduled(cron = "*/30 * * * * *")
