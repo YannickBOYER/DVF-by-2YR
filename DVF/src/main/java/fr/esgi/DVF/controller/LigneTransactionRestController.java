@@ -18,20 +18,20 @@ import java.util.Map;
 public class LigneTransactionRestController {
     private LigneTransactionService ligneTransactionService;
 
+    @GetMapping("EtatImport")
+    public ResponseEntity<String> getEtatImport(){
+        return ResponseEntity.ok(ligneTransactionService.getEtatImport());
+    }
+
     @GetMapping("generatePdfByLocation")
     public ModelAndView generatePdfByLocation(@RequestBody LocationDTO locationDTO){
         if (locationDTO.longitude == null || locationDTO.latitude == null || locationDTO.rayon == null) {
             throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
         }
+        Map<String, LigneTransaction> lignesTransactionByLocation = ligneTransactionService.getLigneTransactionByLocation(locationDTO);
         System.out.println("PDF généré avec succès pour la localisation : " + locationDTO.longitude + ", " + locationDTO.latitude);
-        ModelAndView mav = new ModelAndView(new DvfPdfView(), null);
+        ModelAndView mav = new ModelAndView(new DvfPdfView(), lignesTransactionByLocation);
         return mav;
-    }
-
-    @GetMapping("nombreLigneImportees")
-    public ResponseEntity<String> getNombreDeLignes(){
-        Long nbrLignesImportees = ligneTransactionService.getNombreDeLignes();
-        return ResponseEntity.ok(nbrLignesImportees + " lignes ont été importées.");
     }
 
     @GetMapping("generatePdfByLocationParam")

@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface LigneTransactionService{
 
-    public Long getNombreDeLignes();
+    public String getEtatImport();
 
     public Map<String, LigneTransaction> getLigneTransactionByLocation(LocationDTO location);
 

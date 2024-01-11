@@ -25,6 +25,22 @@ public class LigneTransaction {
 
     private double latitude;
 
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
     public LigneTransaction(String idMutation, Date dateMutation, double longitude, double latitude) {
         this.idMutation = idMutation;
         this.dateMutation = dateMutation;

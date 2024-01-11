@@ -2,6 +2,7 @@ package fr.esgi.DVF.service.impl;
 
 import fr.esgi.DVF.business.LigneTransaction;
 import fr.esgi.DVF.dto.LocationDTO;
+import fr.esgi.DVF.exception.ImportNotCompletedException;
 import fr.esgi.DVF.repository.LigneTransactionRepository;
 import fr.esgi.DVF.service.LigneTransactionService;
 import org.apache.commons.csv.CSVFormat;
@@ -46,6 +47,10 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     }
 
     public Map<String, LigneTransaction> getLigneTransactionByLocation(Double longitude, Double latitude, Integer rayon){
+        if(!isImportTermine){
+            throw new ImportNotCompletedException("L'import du fichier CSV n'est pas terminé.");
+        }
+
         Map<String, LigneTransaction> ligneTransactionMap = new HashMap<>();
         int i = 0;
         Double result;
@@ -94,7 +99,7 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
                         }
                     }
                 }else{
-                    resultatImport();
+                    System.out.println(resultatImport());
                     isImportTermine = true;
                 }
             }
@@ -103,10 +108,19 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         }
     }
 
-    private void resultatImport(){
-        System.out.println("L'ensemble des lignes ont été importées.");
-        System.out.println("Lignes importées : " + this.getNombreDeLignes() + ".");
-        System.out.println("Lignes ignorées : " + this.nbrLigneIgnoree + ".");
+    @Override
+    public String getEtatImport(){
+        if(isImportTermine){
+            return resultatImport();
+        }else{
+            return getNombreDeLignes() + " lignes ont été importées.";
+        }
+    }
+
+    private String resultatImport(){
+        return "L'ensemble des lignes ont été importées.\n"
+                +"Lignes importées : " + this.getNombreDeLignes() + ".\n"
+                + "Lignes ignorées : " + this.nbrLigneIgnoree + ".";
     }
 
     private void importerLigneTransactionByCSVRecord(CSVRecord csvRecord) throws Exception{
