@@ -85,7 +85,7 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         return value * Math.PI / 180;
     }
 
-    @Scheduled(cron = "*/30 * * * * *")
+    @Scheduled(cron = "*/10 * * * * *")
     //@Scheduled(cron = "0 */5 * * * *")
     public void importer() {
         try{

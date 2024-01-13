@@ -25,6 +25,14 @@ public class LigneTransaction {
 
     private double latitude;
 
+    public String getIdMutation() {
+        return idMutation;
+    }
+
+    public Date getDateMutation() {
+        return dateMutation;
+    }
+
     public double getLongitude() {
         return longitude;
     }
