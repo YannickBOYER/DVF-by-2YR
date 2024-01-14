@@ -57,11 +57,31 @@ public class DvfPdfView extends AbstractPdfView {
     }
 
     private PdfPTable createTableFromLigneTransaction(LigneTransaction ligneTransaction) throws DocumentException {
-        PdfPTable table = new PdfPTable(2); // 2 colonnes, une pour les clés et une pour les valeurs
-        table.setWidthPercentage(70);
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(80);
+        table.setTotalWidth(new float[]{150, 350});
 
         addCellToTable(table, "Id mutation", ligneTransaction.getIdMutation());
-        addCellToTable(table, "Date mutation", new SimpleDateFormat("dd/MM/yyyy").format(ligneTransaction.getDateMutation()));
+        if(ligneTransaction.getDateMutation() != null)
+            addCellToTable(table, "Date mutation", new SimpleDateFormat("dd/MM/yyyy").format(ligneTransaction.getDateMutation()));
+        if(ligneTransaction.getNatureMutation() != null)
+            addCellToTable(table, "Nature mutation", ligneTransaction.getNatureMutation());
+        if(ligneTransaction.getValeurFonciere() != null)
+            addCellToTable(table, "Valeur foncière", ligneTransaction.getValeurFonciere().toString());
+        if(ligneTransaction.getAdresse() != null)
+            addCellToTable(table, "Adresse", ligneTransaction.getAdresse());
+        if(ligneTransaction.getIdParcelle() != null)
+            addCellToTable(table, "Id parcelle", ligneTransaction.getIdParcelle());
+        if(ligneTransaction.getNombreLots() != null)
+            addCellToTable(table, "Nombre de lots", ligneTransaction.getNombreLots().toString());
+        if(ligneTransaction.getTypeLocal() != null)
+            addCellToTable(table, "Type local", ligneTransaction.getTypeLocal());
+        if(ligneTransaction.getSurfaceReelleBati() != null)
+            addCellToTable(table, "Surface réelle batiment", ligneTransaction.getSurfaceReelleBati().toString());
+        if(ligneTransaction.getNombrePiecesPrincipales() != null)
+            addCellToTable(table, "Nbr pièces principales", ligneTransaction.getNombrePiecesPrincipales().toString());
+        if(ligneTransaction.getSurfaceTerrain() != null)
+            addCellToTable(table, "Surface terrain", ligneTransaction.getSurfaceTerrain().toString());
 
         return table;
     }

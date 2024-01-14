@@ -124,18 +124,9 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     }
 
     private void importerLigneTransactionByCSVRecord(CSVRecord csvRecord) throws Exception{
-        LigneTransaction ligneTransaction;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        String idMutation = csvRecord.get("id_mutation");
-        Date dateMutation = dateFormat.parse(csvRecord.get("date_mutation"));
-
         // Si les lignes n'ont pas de longitude/latitude on ne les prends pas (sert a rien)
         if(!csvRecord.get("longitude").isEmpty() && !csvRecord.get("latitude").isEmpty()){
-            double longitude = Double.parseDouble(csvRecord.get("longitude"));
-            double latitude = Double.parseDouble(csvRecord.get("latitude"));
-
-            ligneTransaction = new LigneTransaction(idMutation, dateMutation, longitude, latitude);
+            LigneTransaction ligneTransaction = new LigneTransaction(csvRecord);
             ligneTransactionRepository.save(ligneTransaction);
         }else{
             nbrLigneIgnoree++;
