@@ -1,4 +1,4 @@
-package fr.esgi.DVF.exception;
+package fr.esgi.dvf.exception;
 
 public class MissingParamException extends RuntimeException{
     public MissingParamException(String message){

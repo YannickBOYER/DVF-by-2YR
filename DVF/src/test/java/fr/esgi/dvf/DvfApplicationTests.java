@@ -1,4 +1,4 @@
-package fr.esgi.DVF;
+package fr.esgi.dvf;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,10 +1,10 @@
-package fr.esgi.DVF.service.impl;
+package fr.esgi.dvf.service.impl;
 
-import fr.esgi.DVF.business.LigneTransaction;
-import fr.esgi.DVF.dto.LocationDTO;
-import fr.esgi.DVF.exception.ImportNotCompletedException;
-import fr.esgi.DVF.repository.LigneTransactionRepository;
-import fr.esgi.DVF.service.LigneTransactionService;
+import fr.esgi.dvf.business.LigneTransaction;
+import fr.esgi.dvf.dto.LocationDTO;
+import fr.esgi.dvf.exception.ImportNotCompletedException;
+import fr.esgi.dvf.repository.LigneTransactionRepository;
+import fr.esgi.dvf.service.LigneTransactionService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
@@ -29,9 +27,9 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     private boolean isImportTermine = false;
 
     public LigneTransactionServiceImpl(LigneTransactionRepository ligneTransactionRepository){
-        try{
+        try(InputStream inputStream = new FileInputStream("src/main/resources/import.properties")){
             this.ligneTransactionRepository = ligneTransactionRepository;
-            this.importProperties.load(new FileInputStream("src/main/resources/import.properties"));
+            this.importProperties.load(inputStream);
             this.csvParser = getCSVParser();
         }catch (Exception exception){
             System.out.println(exception.getMessage());
@@ -58,9 +56,7 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         for(LigneTransaction ligneTransaction : ligneTransactionRepository.findAll()){
             result = calculateHaversineDistance(longitude, latitude, ligneTransaction.getLongitude(), ligneTransaction.getLatitude());
             if (result <= rayon) {
-                System.out.println(i + ", distance: " + result + ", longitude: " + ligneTransaction.getLongitude() + ", latitude: " + ligneTransaction.getLatitude());
                 ligneTransactionMap.put(Integer.toString(i), ligneTransaction);
-                i++;
             }
         }
         return ligneTransactionMap;
@@ -138,6 +134,7 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         File file = new File(importProperties.getProperty("localFilePath"));
         Reader reader = new InputStreamReader(new BufferedInputStream(file.toURL().openStream()));
         CSVFormat csvFormat = CSVFormat.newFormat(',').builder().setHeader().setSkipHeaderRecord(true).build();
+        reader.close();
         return new CSVParser(reader, csvFormat);
     }
 

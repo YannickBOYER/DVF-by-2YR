@@ -1,7 +1,7 @@
-package fr.esgi.DVF.controller;
+package fr.esgi.dvf.controller;
 
-import fr.esgi.DVF.exception.ImportNotCompletedException;
-import fr.esgi.DVF.exception.MissingParamException;
+import fr.esgi.dvf.exception.ImportNotCompletedException;
+import fr.esgi.dvf.exception.MissingParamException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

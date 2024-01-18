@@ -1,7 +1,7 @@
-package fr.esgi.DVF.service;
+package fr.esgi.dvf.service;
 
-import fr.esgi.DVF.business.LigneTransaction;
-import fr.esgi.DVF.dto.LocationDTO;
+import fr.esgi.dvf.business.LigneTransaction;
+import fr.esgi.dvf.dto.LocationDTO;
 
 import java.util.Map;
 
