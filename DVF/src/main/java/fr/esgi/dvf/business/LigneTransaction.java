@@ -1,4 +1,4 @@
-package fr.esgi.DVF.business;
+package fr.esgi.dvf.business;
 
 
 import jakarta.persistence.Entity;
@@ -146,20 +146,21 @@ public class LigneTransaction {
         Integer nombrePiecesPrincipales = null;
         Integer surfaceTerrain = null;
         Integer nombreLots = null;
+        String regexDateMutation = "-?\\d+(\\.\\d+)?";
 
-        if(!strDateMutation.isEmpty() && strDateMutation.matches("-?\\d+(\\.\\d+)?"))
+        if(!strDateMutation.isEmpty() && strDateMutation.matches(regexDateMutation))
             dateMutation = dateFormat.parse(strDateMutation);
-        if(!strAdresseNumero.isEmpty() && strAdresseNumero.matches("-?\\d+(\\.\\d+)?"))
+        if(!strAdresseNumero.isEmpty() && strAdresseNumero.matches(regexDateMutation))
             adresseNumero = Integer.parseInt(strAdresseNumero);
-        if(!strValeurFonciere.isEmpty() && strValeurFonciere.matches("-?\\d+(\\.\\d+)?"))
+        if(!strValeurFonciere.isEmpty() && strValeurFonciere.matches(regexDateMutation))
             valeurFonciere = Float.parseFloat(strValeurFonciere);
-        if(!strSurfaceReelleBati.isEmpty() && strSurfaceReelleBati.matches("-?\\d+(\\.\\d+)?"))
+        if(!strSurfaceReelleBati.isEmpty() && strSurfaceReelleBati.matches(regexDateMutation))
             surfaceReelleBati = Integer.parseInt(strSurfaceReelleBati);
-        if(!strNombrePiecesPrincipales.isEmpty() && strNombrePiecesPrincipales.matches("-?\\d+(\\.\\d+)?"))
+        if(!strNombrePiecesPrincipales.isEmpty() && strNombrePiecesPrincipales.matches(regexDateMutation))
             nombrePiecesPrincipales = Integer.parseInt(strNombrePiecesPrincipales);
-        if(!strSurfaceTerrain.isEmpty() && strSurfaceTerrain.matches("-?\\d+(\\.\\d+)?"))
+        if(!strSurfaceTerrain.isEmpty() && strSurfaceTerrain.matches(regexDateMutation))
             surfaceTerrain = Integer.parseInt(strSurfaceTerrain);
-        if(!strNombreLots.isEmpty() && strNombreLots.matches("-?\\d+(\\.\\d+)?"))
+        if(!strNombreLots.isEmpty() && strNombreLots.matches(regexDateMutation))
             nombreLots = Integer.parseInt(strNombreLots);
 
         double longitude = Double.parseDouble(csvRecord.get("longitude"));

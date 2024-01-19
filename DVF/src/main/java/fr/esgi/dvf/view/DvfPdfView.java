@@ -1,8 +1,8 @@
-package fr.esgi.DVF.view;
+package fr.esgi.dvf.view;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
-import fr.esgi.DVF.business.LigneTransaction;
+import fr.esgi.dvf.business.LigneTransaction;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.view.document.AbstractPdfView;

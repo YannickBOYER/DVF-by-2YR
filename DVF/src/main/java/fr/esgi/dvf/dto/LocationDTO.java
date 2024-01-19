@@ -1,4 +1,4 @@
-package fr.esgi.DVF.dto;
+package fr.esgi.dvf.dto;
 
 public class LocationDTO {
     public Double longitude;

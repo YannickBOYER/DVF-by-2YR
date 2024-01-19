@@ -1,15 +1,4 @@
 <template>
-  <!-- <div class="flexbox top-left">
-    <form @submit.prevent="handleSubmit" class="mx-auto p-6 bg-white rounded-lg shadow-md max-w-lg flex gap-2 flex-col ">
-      <label for="longitude">Longitude : </label>
-      <input type="text" v-model="input1" placeholder="longitude">
-      <label for="latitude">Latitude : </label>
-      <input type="text" v-model="input2" placeholder="latitude">
-      <label for="radius">Radius (meters): </label>
-      <input type="text" v-model="input3" placeholder="radius">
-      <button @click="submitForm">Validate</button>
-    </form>
-  </div> -->
   
   <form @submit.prevent="handleSubmit" class="mx-auto p-6 bg-white rounded-lg shadow-md max-w-lg flex gap-2 flex-col flexbox">
     <label for="longitude">Longitude : </label>
@@ -18,7 +7,7 @@
     <input type="number" v-model="latitude" placeholder="latitude" step="any">
     <label for="radius">Radius (meters) : </label>
     <input type="number" v-model="radius" placeholder="radius">
-    <button type="submit">Validate</button>
+    <button type="submit" class="btn-submit">Validate</button>
   </form>
 </template>
 
@@ -57,4 +46,17 @@ const handleSubmit = () => {
   top: 0;
   left: 0;
 }
+
+.btn-submit {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 15px;
+}
+
 </style>

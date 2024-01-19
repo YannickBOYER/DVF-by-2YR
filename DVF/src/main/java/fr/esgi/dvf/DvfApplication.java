@@ -1,4 +1,4 @@
-package fr.esgi.DVF;
+package fr.esgi.dvf;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
