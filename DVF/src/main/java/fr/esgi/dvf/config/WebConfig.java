@@ -1,4 +1,4 @@
-package fr.esgi.dvf;
+package fr.esgi.dvf.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,7 +1,7 @@
 package fr.esgi.dvf.service.impl;
 
 import fr.esgi.dvf.business.LigneTransaction;
-import fr.esgi.dvf.dto.LocationDTO;
+import fr.esgi.dvf.dto.PdfGenerateDto;
 import fr.esgi.dvf.exception.ImportNotCompletedException;
 import fr.esgi.dvf.repository.LigneTransactionRepository;
 import fr.esgi.dvf.service.LigneTransactionService;
@@ -26,12 +26,14 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     private int nbrLigneIgnoree;
     private boolean isImportTermine = false;
 
+
     public LigneTransactionServiceImpl(LigneTransactionRepository ligneTransactionRepository){
-        try(InputStream inputStream = new FileInputStream("src/main/resources/import.properties")){
+        try(FileInputStream fileInputStream = new FileInputStream("src/main/resources/import.properties")){
             this.ligneTransactionRepository = ligneTransactionRepository;
-            this.importProperties.load(inputStream);
+            this.importProperties.load(fileInputStream);
             this.csvParser = getCSVParser();
         }catch (Exception exception){
+            // Remplacer par un logger
             System.out.println(exception.getMessage());
         }
     }
@@ -40,8 +42,9 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         return ligneTransactionRepository.count();
     }
 
-    public Map<String, LigneTransaction> getLigneTransactionByLocation(LocationDTO locationDTO){
-        return getLigneTransactionByLocation(locationDTO.longitude, locationDTO.latitude, locationDTO.rayon);
+    @Override
+    public Map<String, LigneTransaction> getLigneTransactionByLocation(PdfGenerateDto pdfGenerateDto){
+        return getLigneTransactionByLocation(pdfGenerateDto.longitude, pdfGenerateDto.latitude, pdfGenerateDto.rayon);
     }
 
     public Map<String, LigneTransaction> getLigneTransactionByLocation(Double longitude, Double latitude, Integer rayon){
@@ -58,6 +61,7 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
             if (result <= rayon) {
                 ligneTransactionMap.put(Integer.toString(i), ligneTransaction);
             }
+            i++;
         }
         return ligneTransactionMap;
     }
@@ -97,10 +101,11 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
                 }else{
                     System.out.println(resultatImport());
                     isImportTermine = true;
+                    csvParser.close();
                 }
             }
         }catch (Exception exception){
-            exception.printStackTrace();
+
         }
     }
 
@@ -134,7 +139,6 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         File file = new File(importProperties.getProperty("localFilePath"));
         Reader reader = new InputStreamReader(new BufferedInputStream(file.toURL().openStream()));
         CSVFormat csvFormat = CSVFormat.newFormat(',').builder().setHeader().setSkipHeaderRecord(true).build();
-        reader.close();
         return new CSVParser(reader, csvFormat);
     }
 

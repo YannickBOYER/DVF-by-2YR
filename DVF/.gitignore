@@ -32,5 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-### full.csv ###
+### doc ###
 doc/csv/full.csv
+doc/pdf
