@@ -4,8 +4,10 @@ import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import fr.esgi.dvf.business.LigneTransaction;
 import fr.esgi.dvf.business.Pdf;
-import fr.esgi.dvf.dto.PdfGenerateDto;
+import fr.esgi.dvf.dto.PdfLocationDto;
+import fr.esgi.dvf.exception.ImportNotCompletedException;
 import fr.esgi.dvf.exception.MissingParamException;
+import fr.esgi.dvf.exception.PdfNotFoundException;
 import fr.esgi.dvf.repository.PdfRepository;
 import fr.esgi.dvf.service.LigneTransactionService;
 import fr.esgi.dvf.service.PdfService;
@@ -27,18 +29,34 @@ public class PdfServiceImpl implements PdfService {
     private JmsTemplate jmsTemplate;
 
     @Override
-    public void lancerProcedureGeneration(Double longitude, Double latitude, Integer rayon){
-        if (longitude == null || latitude == null || rayon == null) {
-            throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
-        }
-        Pdf pdf = pdfRepository.save(new Pdf());
-        jmsTemplate.convertAndSend("generatePdf", new PdfGenerateDto(longitude, latitude, rayon, pdf.getId()));
+    public Pdf getById(Long id){
+        return pdfRepository.findById(id).orElseThrow(()-> new PdfNotFoundException("Pdf non trouvé"));
     }
 
     @Override
-    public void generer(PdfGenerateDto pdfGenerateDto){
-        Map<String, LigneTransaction> lignesTransactionByLocation = ligneTransactionService.getLigneTransactionByLocation(pdfGenerateDto);
-        this.genererByLignesTransaction(lignesTransactionByLocation.values(), pdfGenerateDto.idPdf);
+    public Long lancerProcedureGeneration(Double longitude, Double latitude, Integer rayon){
+        if (longitude == null || latitude == null || rayon == null) {
+            throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
+        }
+        if(!ligneTransactionService.isImportTermine()){
+            throw new ImportNotCompletedException("L'import du fichier CSV n'est pas terminé.");
+        }
+        Pdf pdf = pdfRepository.save(new Pdf());
+        jmsTemplate.convertAndSend("generatePdf", new PdfLocationDto(longitude, latitude, rayon, pdf.getId()));
+        return pdf.getId();
+    }
+
+    @Override
+    public void generer(PdfLocationDto pdfLocationDto){
+        Map<String, LigneTransaction> lignesTransactionByLocation = ligneTransactionService.findAllByLocation(pdfLocationDto);
+        File pdf = this.genererByLignesTransaction(lignesTransactionByLocation.values(), pdfLocationDto.idPdf);
+        updatePath(pdfLocationDto.idPdf, pdf.getPath());
+    }
+
+    private void updatePath(Long id, String newPath){
+        Pdf pdf = getById(id);
+        pdf.setPath(newPath);
+        pdfRepository.save(pdf);
     }
 
     private File genererByLignesTransaction(Collection<LigneTransaction> lignesTransactionByLocation, Long idPdf){

@@ -2,6 +2,7 @@ package fr.esgi.dvf.controller;
 
 import fr.esgi.dvf.exception.ImportNotCompletedException;
 import fr.esgi.dvf.exception.MissingParamException;
+import fr.esgi.dvf.exception.PdfNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,4 +21,8 @@ public class LigneTransactionRestControllerAdvice {
     public String handleImportNotCompletedException(ImportNotCompletedException e) {
         return e.getMessage();
     }
+
+    @ExceptionHandler(PdfNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handlePdfNotFoundException(PdfNotFoundException e){ return e.getMessage(); }
 }

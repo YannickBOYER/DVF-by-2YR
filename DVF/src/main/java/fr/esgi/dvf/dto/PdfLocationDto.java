@@ -2,7 +2,7 @@ package fr.esgi.dvf.dto;
 
 import java.io.Serializable;
 
-public class PdfGenerateDto implements Serializable {
+public class PdfLocationDto implements Serializable {
     public final Double longitude;
 
     public final Double latitude;
@@ -11,7 +11,7 @@ public class PdfGenerateDto implements Serializable {
 
     public final Long idPdf;
 
-    public PdfGenerateDto(Double longitude, Double latitude, Integer rayon, Long idPdf) {
+    public PdfLocationDto(Double longitude, Double latitude, Integer rayon, Long idPdf) {
         super();
         this.longitude = longitude;
         this.latitude = latitude;

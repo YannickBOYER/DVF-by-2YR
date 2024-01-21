@@ -17,4 +17,12 @@ public class Pdf {
     public Long getId() {
         return id;
     }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getPath(){
+        return this.path;
+    }
 }

@@ -1,7 +1,7 @@
 package fr.esgi.dvf.service.impl;
 
 import fr.esgi.dvf.business.LigneTransaction;
-import fr.esgi.dvf.dto.PdfGenerateDto;
+import fr.esgi.dvf.dto.PdfLocationDto;
 import fr.esgi.dvf.exception.ImportNotCompletedException;
 import fr.esgi.dvf.repository.LigneTransactionRepository;
 import fr.esgi.dvf.service.LigneTransactionService;
@@ -41,9 +41,13 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     public Long getNombreDeLignes(){
         return ligneTransactionRepository.count();
     }
+    @Override
+    public boolean isImportTermine(){
+        return isImportTermine;
+    }
 
     @Override
-    public Map<String, LigneTransaction> getLigneTransactionByLocation(PdfGenerateDto pdfGenerateDto){
+    public Map<String, LigneTransaction> findAllByLocation(PdfLocationDto pdfGenerateDto){
         return getLigneTransactionByLocation(pdfGenerateDto.longitude, pdfGenerateDto.latitude, pdfGenerateDto.rayon);
     }
 
@@ -134,7 +138,7 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         }
     }
 
-    private CSVParser getCSVParser() throws Exception{
+    private CSVParser getCSVParser() throws IOException {
         downloadAndDecompressGzip();
         File file = new File(importProperties.getProperty("localFilePath"));
         Reader reader = new InputStreamReader(new BufferedInputStream(file.toURL().openStream()));
