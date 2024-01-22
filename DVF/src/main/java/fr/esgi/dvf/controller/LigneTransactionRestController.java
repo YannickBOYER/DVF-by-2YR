@@ -1,6 +1,5 @@
 package fr.esgi.dvf.controller;
 
-import fr.esgi.dvf.business.LigneTransaction;
 import fr.esgi.dvf.business.Pdf;
 import fr.esgi.dvf.exception.MissingParamException;
 import fr.esgi.dvf.service.LigneTransactionService;
@@ -40,26 +39,18 @@ public class LigneTransactionRestController {
     }*/
 
     @GetMapping("generatePdfByLocation")
-    public ResponseEntity<Long> generatePdfByLocation(@RequestParam(name = "longitude", required = false) Double longitude, @RequestParam(name = "latitude", required = false) Double latitude, @RequestParam(name = "rayon", required = false) Integer rayon){
-        Long idPdf = pdfService.lancerProcedureGeneration(longitude, latitude, rayon);
-        return ResponseEntity.ok(idPdf);
-    }
-
-    @GetMapping("getPdfById")
-    public ResponseEntity<byte[]> getById(@RequestParam(name = "id", required = false) Long id)throws IOException {
-        Pdf pdf = pdfService.getById(id);
-        File fichierPdf = new File(pdf.getPath());
-        if (!fichierPdf.exists()) {
+    public ResponseEntity<byte[]> generateByLocation(@RequestParam(name = "longitude", required = false) Double longitude, @RequestParam(name = "latitude", required = false) Double latitude, @RequestParam(name = "rayon", required = false) Integer rayon) throws Exception {
+        File pdf = pdfService.generateByLocation(longitude, latitude, rayon);
+        if(!pdf.exists()){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }else{
+            byte[] contenuPdf = Files.readAllBytes(pdf.toPath());
+
+            HttpHeaders entetes = new HttpHeaders();
+            entetes.setContentType(MediaType.APPLICATION_PDF);
+
+            return new ResponseEntity<>(contenuPdf, entetes, HttpStatus.OK);
         }
-
-        byte[] contenuPdf = Files.readAllBytes(fichierPdf.toPath());
-
-        HttpHeaders entetes = new HttpHeaders();
-        entetes.setContentType(MediaType.APPLICATION_PDF);
-
-        return new ResponseEntity<>(contenuPdf, entetes, HttpStatus.OK);
     }
 
 }
-

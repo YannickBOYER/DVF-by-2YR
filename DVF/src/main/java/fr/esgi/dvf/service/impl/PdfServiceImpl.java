@@ -11,6 +11,9 @@ import fr.esgi.dvf.exception.PdfNotFoundException;
 import fr.esgi.dvf.repository.PdfRepository;
 import fr.esgi.dvf.service.LigneTransactionService;
 import fr.esgi.dvf.service.PdfService;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.TextMessage;
 import lombok.AllArgsConstructor;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
@@ -28,29 +31,40 @@ public class PdfServiceImpl implements PdfService {
     private LigneTransactionService ligneTransactionService;
     private JmsTemplate jmsTemplate;
 
-    @Override
-    public Pdf getById(Long id){
+    private Pdf getById(Long id){
         return pdfRepository.findById(id).orElseThrow(()-> new PdfNotFoundException("Pdf non trouvé"));
     }
 
     @Override
-    public Long lancerProcedureGeneration(Double longitude, Double latitude, Integer rayon){
+    public File generateByLocation(Double longitude, Double latitude, Integer rayon) throws JMSException {
         if (longitude == null || latitude == null || rayon == null) {
             throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
         }
-        if(!ligneTransactionService.isImportTermine()){
+        if(!ligneTransactionService.isImportTermine()) {
             throw new ImportNotCompletedException("L'import du fichier CSV n'est pas terminé.");
         }
         Pdf pdf = pdfRepository.save(new Pdf());
-        jmsTemplate.convertAndSend("generatePdf", new PdfLocationDto(longitude, latitude, rayon, pdf.getId()));
-        return pdf.getId();
+
+        PdfLocationDto requestDto = new PdfLocationDto(longitude, latitude, rayon, pdf.getId());
+        Message response = jmsTemplate.sendAndReceive("generatePdf",
+                session -> session.createObjectMessage(requestDto));
+
+        String path = "";
+        if(response != null){
+            path = ((TextMessage)response).getText();
+        }else{
+            throw new RuntimeException("Pdf non généré");
+        }
+
+        return new File(path);
     }
 
     @Override
-    public void generer(PdfLocationDto pdfLocationDto){
+    public String generer(PdfLocationDto pdfLocationDto) {
         Map<String, LigneTransaction> lignesTransactionByLocation = ligneTransactionService.findAllByLocation(pdfLocationDto);
         File pdf = this.genererByLignesTransaction(lignesTransactionByLocation.values(), pdfLocationDto.idPdf);
         updatePath(pdfLocationDto.idPdf, pdf.getPath());
+        return pdf.getPath();
     }
 
     private void updatePath(Long id, String newPath){

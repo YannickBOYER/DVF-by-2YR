@@ -20,6 +20,7 @@ import java.util.Map;
 
 @Service
 public class LigneTransactionServiceImpl implements LigneTransactionService {
+
     private LigneTransactionRepository ligneTransactionRepository;
     private final Properties importProperties = new Properties();
     private CSVParser csvParser;
@@ -27,7 +28,8 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     private boolean isImportTermine = false;
 
 
-    public LigneTransactionServiceImpl(LigneTransactionRepository ligneTransactionRepository){
+    public LigneTransactionServiceImpl(LigneTransactionRepository ligneTransactionRepository) {
+        // this.getClass().getResourceAsStream("import.properties")
         try(FileInputStream fileInputStream = new FileInputStream("src/main/resources/import.properties")){
             this.ligneTransactionRepository = ligneTransactionRepository;
             this.importProperties.load(fileInputStream);
@@ -41,13 +43,14 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     public Long getNombreDeLignes(){
         return ligneTransactionRepository.count();
     }
+
     @Override
     public boolean isImportTermine(){
         return isImportTermine;
     }
 
     @Override
-    public Map<String, LigneTransaction> findAllByLocation(PdfLocationDto pdfGenerateDto){
+    public Map<String, LigneTransaction> findAllByLocation(PdfLocationDto pdfGenerateDto) {
         return getLigneTransactionByLocation(pdfGenerateDto.longitude, pdfGenerateDto.latitude, pdfGenerateDto.rayon);
     }
 
@@ -122,7 +125,7 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         }
     }
 
-    private String resultatImport(){
+    private String resultatImport() {
         return "L'ensemble des lignes ont été importées.\n"
                 +"Lignes importées : " + this.getNombreDeLignes() + ".\n"
                 + "Lignes ignorées : " + this.nbrLigneIgnoree + ".";

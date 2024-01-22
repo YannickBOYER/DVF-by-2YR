@@ -1,13 +1,13 @@
 package fr.esgi.dvf.service;
 
-import fr.esgi.dvf.business.Pdf;
 import fr.esgi.dvf.dto.PdfLocationDto;
+import jakarta.jms.JMSException;
+
+import java.io.File;
 
 public interface PdfService {
 
-    public Long lancerProcedureGeneration(Double longitude, Double latitude, Integer rayon);
+    public File generateByLocation(Double longitude, Double latitude, Integer rayon) throws JMSException;
 
-    public void generer(PdfLocationDto pdfGenerateDto);
-
-    public Pdf getById(Long id);
+    public String generer(PdfLocationDto pdfGenerateDto);
 }
