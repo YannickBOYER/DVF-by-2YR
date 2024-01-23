@@ -7,6 +7,7 @@ import fr.esgi.dvf.business.Pdf;
 import fr.esgi.dvf.dto.PdfLocationDto;
 import fr.esgi.dvf.exception.ImportNotCompletedException;
 import fr.esgi.dvf.exception.MissingParamException;
+import fr.esgi.dvf.exception.PdfGeneratedException;
 import fr.esgi.dvf.exception.PdfNotFoundException;
 import fr.esgi.dvf.repository.PdfRepository;
 import fr.esgi.dvf.service.LigneTransactionService;
@@ -40,7 +41,7 @@ public class PdfServiceImpl implements PdfService {
         if (longitude == null || latitude == null || rayon == null) {
             throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
         }
-        if(!ligneTransactionService.isImportTermine()) {
+        if(!ligneTransactionService.isImportCompleted()) {
             throw new ImportNotCompletedException("L'import du fichier CSV n'est pas terminé.");
         }
         Pdf pdf = pdfRepository.save(new Pdf());
@@ -53,7 +54,7 @@ public class PdfServiceImpl implements PdfService {
         if(response != null){
             path = ((TextMessage)response).getText();
         }else{
-            throw new RuntimeException("Pdf non généré");
+            throw new PdfGeneratedException("Une erreur est survenue lors de la génération du fichier pdf");
         }
 
         return new File(path);
@@ -61,8 +62,8 @@ public class PdfServiceImpl implements PdfService {
 
     @Override
     public String generer(PdfLocationDto pdfLocationDto) {
-        Map<String, LigneTransaction> lignesTransactionByLocation = ligneTransactionService.findAllByLocation(pdfLocationDto);
-        File pdf = this.genererByLignesTransaction(lignesTransactionByLocation.values(), pdfLocationDto.idPdf);
+        Map<String, LigneTransaction> lignesTransactionByLocation = ligneTransactionService.findAllByLocation(pdfLocationDto.longitude, pdfLocationDto.latitude, pdfLocationDto.rayon);
+        File pdf = this.generateFile(lignesTransactionByLocation.values(), pdfLocationDto.idPdf);
         updatePath(pdfLocationDto.idPdf, pdf.getPath());
         return pdf.getPath();
     }
@@ -73,7 +74,7 @@ public class PdfServiceImpl implements PdfService {
         pdfRepository.save(pdf);
     }
 
-    private File genererByLignesTransaction(Collection<LigneTransaction> lignesTransactionByLocation, Long idPdf){
+    private File generateFile(Collection<LigneTransaction> lignesTransactionByLocation, Long idPdf){
         File pdf = new File("doc\\pdf\\pdf - " + idPdf + ".pdf");
         try{
             Document document = new Document();

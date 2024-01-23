@@ -25,7 +25,7 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     private final Properties importProperties = new Properties();
     private CSVParser csvParser;
     private int nbrLigneIgnoree;
-    private boolean isImportTermine = false;
+    private boolean isImportCompleted = false;
 
 
     public LigneTransactionServiceImpl(LigneTransactionRepository ligneTransactionRepository) {
@@ -45,23 +45,19 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     }
 
     @Override
-    public boolean isImportTermine(){
-        return isImportTermine;
+    public boolean isImportCompleted(){
+        return isImportCompleted;
     }
 
     @Override
-    public Map<String, LigneTransaction> findAllByLocation(PdfLocationDto pdfGenerateDto) {
-        return getLigneTransactionByLocation(pdfGenerateDto.longitude, pdfGenerateDto.latitude, pdfGenerateDto.rayon);
-    }
-
-    public Map<String, LigneTransaction> getLigneTransactionByLocation(Double longitude, Double latitude, Integer rayon){
-        if(!isImportTermine){
+    public Map<String, LigneTransaction> findAllByLocation(Double longitude, Double latitude, Integer rayon){
+        if(!isImportCompleted){
             throw new ImportNotCompletedException("L'import du fichier CSV n'est pas terminé.");
         }
 
         Map<String, LigneTransaction> ligneTransactionMap = new HashMap<>();
         int i = 0;
-        Double result;
+        double result;
 
         for(LigneTransaction ligneTransaction : ligneTransactionRepository.findAll()){
             result = calculateHaversineDistance(longitude, latitude, ligneTransaction.getLongitude(), ligneTransaction.getLatitude());
@@ -74,15 +70,15 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     }
 
     public static Double calculateHaversineDistance(Double longitude1, Double latitude1, Double longitude2, Double latitude2) {
-        final Integer r = 6371000; // Rayon de la terre en mètres
+        final int r = 6371000; // Rayon de la terre en mètres
 
         // Calcul de la distance de Haversine (Méthode utilisée pour trouver la distance entre 2 points géographiques)
         Double latDistance = degToRad(latitude2 - latitude1);
         Double lonDistance = degToRad(longitude2 - longitude1);
         // Première partie du calcul (la partie intérieure de l'arc tangent)
-        Double a = Math.pow(Math.sin(latDistance/2),2) + Math.cos(degToRad(latitude1)) * Math.cos(degToRad(latitude2)) * Math.pow(Math.sin(lonDistance/2),2);
+        double a = Math.pow(Math.sin(latDistance/2),2) + Math.cos(degToRad(latitude1)) * Math.cos(degToRad(latitude2)) * Math.pow(Math.sin(lonDistance/2),2);
         // Deuxième partie du calcul utilisant le résultat précédent
-        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         // On retourne le résultat du calcul multiplié par le rayon de la Terre afin d'avoir la distance en mètres entre les 2 points
         return r * c;
@@ -94,31 +90,26 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
 
     @Scheduled(cron = "*/10 * * * * *")
     //@Scheduled(cron = "0 */5 * * * *")
-    public void importer() {
-        try{
-            if(!isImportTermine){
-                if(csvParser.iterator().hasNext()){
-                    System.out.println("Importation de 100 000 lignes en base H2...");
-                    for (int i = 0; i < Integer.parseInt(importProperties.getProperty("nbrIntervalLigneParImport")); i++){
-                        if(csvParser.iterator().hasNext()){
-                            CSVRecord csvRecord = csvParser.iterator().next();
-                            importerLigneTransactionByCSVRecord(csvRecord);
-                        }
+    public void importer() throws Exception {
+        if(!isImportCompleted){
+            if(csvParser.iterator().hasNext()){
+                System.out.println(getEtatImport());
+                for (int i = 0; i < Integer.parseInt(importProperties.getProperty("nbrIntervalLigneParImport")); i++){
+                    if(csvParser.iterator().hasNext()){
+                        CSVRecord csvRecord = csvParser.iterator().next();
+                        importerLigneTransactionByCSVRecord(csvRecord);
                     }
-                }else{
-                    System.out.println(resultatImport());
-                    isImportTermine = true;
-                    csvParser.close();
                 }
+            }else{
+                isImportCompleted = true;
+                csvParser.close();
+                System.out.println(getEtatImport());
             }
-        }catch (Exception exception){
-
         }
     }
 
-    @Override
-    public String getEtatImport(){
-        if(isImportTermine){
+    private String getEtatImport(){
+        if(isImportCompleted){
             return resultatImport();
         }else{
             return getNombreDeLignes() + " lignes ont été importées.";
