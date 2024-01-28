@@ -1,10 +1,11 @@
 package fr.esgi.dvf.service.impl;
 
 import fr.esgi.dvf.business.LigneTransaction;
-import fr.esgi.dvf.dto.PdfLocationDto;
 import fr.esgi.dvf.exception.ImportNotCompletedException;
 import fr.esgi.dvf.repository.LigneTransactionRepository;
 import fr.esgi.dvf.service.LigneTransactionService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
@@ -21,22 +23,22 @@ import java.util.Map;
 @Service
 public class LigneTransactionServiceImpl implements LigneTransactionService {
 
+    private final Logger logger = LogManager.getLogger(LigneTransactionServiceImpl.class);
+
     private LigneTransactionRepository ligneTransactionRepository;
     private final Properties importProperties = new Properties();
     private CSVParser csvParser;
     private int nbrLigneIgnoree;
     private boolean isImportCompleted = false;
 
-
     public LigneTransactionServiceImpl(LigneTransactionRepository ligneTransactionRepository) {
-        // this.getClass().getResourceAsStream("import.properties")
         try(FileInputStream fileInputStream = new FileInputStream("src/main/resources/import.properties")){
             this.ligneTransactionRepository = ligneTransactionRepository;
             this.importProperties.load(fileInputStream);
-            this.csvParser = getCSVParser();
+            downloadAndDecompressGzip();
+            this.csvParser = getCSVParser(importProperties.getProperty("localFilePath"));
         }catch (Exception exception){
-            // Remplacer par un logger
-            System.out.println(exception.getMessage());
+            logger.warn(exception.getMessage());
         }
     }
 
@@ -90,11 +92,15 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
 
     @Scheduled(cron = "*/10 * * * * *")
     //@Scheduled(cron = "0 */5 * * * *")
-    public void importer() throws Exception {
+    public void importSheduled() throws Exception {
+        importByNbrInterval(Integer.parseInt(importProperties.getProperty("nbrIntervalLigneParImport")));
+    }
+
+    public void importByNbrInterval(int nbrIntervalLigne) throws Exception {
         if(!isImportCompleted){
             if(csvParser.iterator().hasNext()){
-                System.out.println(getEtatImport());
-                for (int i = 0; i < Integer.parseInt(importProperties.getProperty("nbrIntervalLigneParImport")); i++){
+                logger.warn(getEtatImport());
+                for (int i = 0; i < nbrIntervalLigne; i++){
                     if(csvParser.iterator().hasNext()){
                         CSVRecord csvRecord = csvParser.iterator().next();
                         importerLigneTransactionByCSVRecord(csvRecord);
@@ -103,12 +109,12 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
             }else{
                 isImportCompleted = true;
                 csvParser.close();
-                System.out.println(getEtatImport());
+                logger.warn(getEtatImport());
             }
         }
     }
 
-    private String getEtatImport(){
+    public String getEtatImport(){
         if(isImportCompleted){
             return resultatImport();
         }else{
@@ -122,8 +128,8 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
                 + "Lignes ignorées : " + this.nbrLigneIgnoree + ".";
     }
 
-    private void importerLigneTransactionByCSVRecord(CSVRecord csvRecord) throws Exception{
-        // Si les lignes n'ont pas de longitude/latitude on ne les prends pas (sert a rien)
+    public void importerLigneTransactionByCSVRecord(CSVRecord csvRecord) throws ParseException {
+        // Si les lignes n'ont pas de longitude/latitude on ne les prends pas
         if(!csvRecord.get("longitude").isEmpty() && !csvRecord.get("latitude").isEmpty()){
             LigneTransaction ligneTransaction = new LigneTransaction(csvRecord);
             ligneTransactionRepository.save(ligneTransaction);
@@ -132,9 +138,8 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         }
     }
 
-    private CSVParser getCSVParser() throws IOException {
-        downloadAndDecompressGzip();
-        File file = new File(importProperties.getProperty("localFilePath"));
+    public CSVParser getCSVParser(String csvFilePath) throws IOException {
+        File file = new File(csvFilePath);
         Reader reader = new InputStreamReader(new BufferedInputStream(file.toURL().openStream()));
         CSVFormat csvFormat = CSVFormat.newFormat(',').builder().setHeader().setSkipHeaderRecord(true).build();
         return new CSVParser(reader, csvFormat);

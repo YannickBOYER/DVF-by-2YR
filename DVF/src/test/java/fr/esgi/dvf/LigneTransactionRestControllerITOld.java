@@ -23,13 +23,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class LigneTransactionRestControllerIT {
+class LigneTransactionRestControllerITOld {
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,7 +44,7 @@ class LigneTransactionRestControllerIT {
     @InjectMocks
     private LigneTransactionRestController ligneTransactionRestController;
 
-    @Test
+    /*@Test
     @Order(1)
     void shouldImportFileSuccessfully() throws Exception{
         String csvTestFilePath = "doc/csv/testCsv.csv";
@@ -62,7 +61,7 @@ class LigneTransactionRestControllerIT {
 
         assertEquals(1000, ligneTransactionService.getNombreDeLignes());
         System.out.println("L'import de 1000 lignes a fonctionné");
-    }
+    }*/
 
     @Test
     @Order(2)
@@ -81,7 +80,7 @@ class LigneTransactionRestControllerIT {
     @Test
     @Order(3)
     void shouldGeneratePdf()throws Exception{
-        shouldImportFileSuccessfully();
+        //shouldImportFileSuccessfully();
 
         String longitude = "4.848466";
         String latitude = "45.754752";

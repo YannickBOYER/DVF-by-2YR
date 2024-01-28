@@ -34,15 +34,4 @@ public class LigneTransactionRestController {
         }
     }
 
-    /*@GetMapping("generatePdfByLocation")
-    public ModelAndView generatePdfByLocation(@RequestParam(name = "longitude", required = false) Double longitude, @RequestParam(name = "latitude", required = false) Double latitude, @RequestParam(name = "rayon", required = false) Integer rayon){
-        if (longitude == null || latitude == null || rayon == null) {
-            throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
-        }
-
-        Map<String, LigneTransaction> lignesTransactionByLocation = ligneTransactionService.getLigneTransactionByLocation(longitude, latitude, rayon);
-        System.out.println("PDF généré avec succès pour la localisation : " + longitude + ", " + latitude);
-        return new ModelAndView(new DvfPdfView(), lignesTransactionByLocation);
-    }*/
-
 }

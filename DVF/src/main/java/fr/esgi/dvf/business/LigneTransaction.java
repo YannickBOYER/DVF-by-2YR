@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.csv.CSVRecord;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -118,19 +119,19 @@ public class LigneTransaction {
     }
 
     /// Import CSV
-    public LigneTransaction(CSVRecord csvRecord) throws Exception{
+    public LigneTransaction(CSVRecord csvRecord) throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        String idMutation = csvRecord.get("id_mutation");
-        String natureMutation = csvRecord.get("nature_mutation");
-        String adresseSuffixe = csvRecord.get("adresse_suffixe");
-        String adresseNomVoie = csvRecord.get("adresse_nom_voie");
-        String adresseCodeVoie = csvRecord.get("adresse_code_voie");
-        String codePostal = csvRecord.get("code_postal");
-        String nomCommune = csvRecord.get("nom_commune");
-        String codeDepartement = csvRecord.get("code_departement");
-        String idParcelle = csvRecord.get("id_parcelle");
-        String typeLocal = csvRecord.get("type_local");
+        String importIdMutation = csvRecord.get("id_mutation");
+        String importNatureMutation = csvRecord.get("nature_mutation");
+        String importAdresseSuffixe = csvRecord.get("adresse_suffixe");
+        String importAdresseNomVoie = csvRecord.get("adresse_nom_voie");
+        String importAdresseCodeVoie = csvRecord.get("adresse_code_voie");
+        String importCodePostal = csvRecord.get("code_postal");
+        String importNomCommune = csvRecord.get("nom_commune");
+        String importCodeDepartement = csvRecord.get("code_departement");
+        String importIdParcelle = csvRecord.get("id_parcelle");
+        String importTypeLocal = csvRecord.get("type_local");
         String strDateMutation = csvRecord.get("date_mutation");
         String strAdresseNumero = csvRecord.get("adresse_numero");
         String strValeurFonciere = csvRecord.get("valeur_fonciere");
@@ -139,52 +140,52 @@ public class LigneTransaction {
         String strSurfaceTerrain = csvRecord.get("surface_terrain");
         String strNombreLots = csvRecord.get("nombre_lots");
 
-        Date dateMutation = null;
-        Integer adresseNumero = null;
-        Float valeurFonciere = null;
-        Integer surfaceReelleBati = null;
-        Integer nombrePiecesPrincipales = null;
-        Integer surfaceTerrain = null;
-        Integer nombreLots = null;
+        Date importDateMutation = null;
+        Integer importAdresseNumero = null;
+        Float importValeurFonciere = null;
+        Integer importSurfaceReelleBati = null;
+        Integer importNombrePiecesPrincipales = null;
+        Integer importSuurfaceTerrain = null;
+        Integer importNombreLots = null;
         String regexDateMutation = "-?\\d+(\\.\\d+)?";
 
         if(!strDateMutation.isEmpty() && strDateMutation.matches(regexDateMutation))
-            dateMutation = dateFormat.parse(strDateMutation);
+            importDateMutation = dateFormat.parse(strDateMutation);
         if(!strAdresseNumero.isEmpty() && strAdresseNumero.matches(regexDateMutation))
-            adresseNumero = Integer.parseInt(strAdresseNumero);
+            importAdresseNumero = Integer.parseInt(strAdresseNumero);
         if(!strValeurFonciere.isEmpty() && strValeurFonciere.matches(regexDateMutation))
-            valeurFonciere = Float.parseFloat(strValeurFonciere);
+            importValeurFonciere = Float.parseFloat(strValeurFonciere);
         if(!strSurfaceReelleBati.isEmpty() && strSurfaceReelleBati.matches(regexDateMutation))
-            surfaceReelleBati = Integer.parseInt(strSurfaceReelleBati);
+            importSurfaceReelleBati = Integer.parseInt(strSurfaceReelleBati);
         if(!strNombrePiecesPrincipales.isEmpty() && strNombrePiecesPrincipales.matches(regexDateMutation))
-            nombrePiecesPrincipales = Integer.parseInt(strNombrePiecesPrincipales);
+            importNombrePiecesPrincipales = Integer.parseInt(strNombrePiecesPrincipales);
         if(!strSurfaceTerrain.isEmpty() && strSurfaceTerrain.matches(regexDateMutation))
-            surfaceTerrain = Integer.parseInt(strSurfaceTerrain);
+            importSuurfaceTerrain = Integer.parseInt(strSurfaceTerrain);
         if(!strNombreLots.isEmpty() && strNombreLots.matches(regexDateMutation))
-            nombreLots = Integer.parseInt(strNombreLots);
+            importNombreLots = Integer.parseInt(strNombreLots);
 
-        double longitude = Double.parseDouble(csvRecord.get("longitude"));
-        double latitude = Double.parseDouble(csvRecord.get("latitude"));
+        double importLongitude = Double.parseDouble(csvRecord.get("longitude"));
+        double importLatitude = Double.parseDouble(csvRecord.get("latitude"));
 
-        this.idMutation = idMutation;
-        this.dateMutation = dateMutation;
-        this.natureMutation = natureMutation;
-        this.valeurFonciere = valeurFonciere;
-        this.adresseNumero = adresseNumero;
-        this.adresseSuffixe = adresseSuffixe;
-        this.adresseNomVoie = adresseNomVoie;
-        this.adresseCodeVoie = adresseCodeVoie;
-        this.codePostal = codePostal;
-        this.nomCommune = nomCommune;
-        this.codeDepartement = codeDepartement;
-        this.idParcelle = idParcelle;
-        this.nombreLots = nombreLots;
-        this.typeLocal = typeLocal;
-        this.surfaceReelleBati = surfaceReelleBati;
-        this.nombrePiecesPrincipales = nombrePiecesPrincipales;
-        this.surfaceTerrain = surfaceTerrain;
-        this.longitude = longitude;
-        this.latitude = latitude;
+        this.idMutation = importIdMutation;
+        this.dateMutation = importDateMutation;
+        this.natureMutation = importNatureMutation;
+        this.valeurFonciere = importValeurFonciere;
+        this.adresseNumero = importAdresseNumero;
+        this.adresseSuffixe = importAdresseSuffixe;
+        this.adresseNomVoie = importAdresseNomVoie;
+        this.adresseCodeVoie = importAdresseCodeVoie;
+        this.codePostal = importCodePostal;
+        this.nomCommune = importNomCommune;
+        this.codeDepartement = importCodeDepartement;
+        this.idParcelle = importIdParcelle;
+        this.nombreLots = importNombreLots;
+        this.typeLocal = importTypeLocal;
+        this.surfaceReelleBati = importSurfaceReelleBati;
+        this.nombrePiecesPrincipales = importNombrePiecesPrincipales;
+        this.surfaceTerrain = importSuurfaceTerrain;
+        this.longitude = importLongitude;
+        this.latitude = importLatitude;
     }
 
 }
