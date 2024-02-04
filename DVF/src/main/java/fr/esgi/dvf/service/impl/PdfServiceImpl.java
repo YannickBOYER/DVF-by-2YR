@@ -35,8 +35,8 @@ public class PdfServiceImpl implements PdfService {
     private LigneTransactionService ligneTransactionService;
     private JmsTemplate jmsTemplate;
 
-    private Pdf getById(Long id){
-        return pdfRepository.findById(id).orElseThrow(()-> new PdfNotFoundException("Pdf non trouvé"));
+    private Pdf getById(Long id) {
+        return pdfRepository.findById(id).orElseThrow(() -> new PdfNotFoundException("Pdf non trouvé"));
     }
 
     @Override
@@ -44,9 +44,9 @@ public class PdfServiceImpl implements PdfService {
         if (longitude == null || latitude == null || rayon == null) {
             throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
         }
-        if(!ligneTransactionService.isImportCompleted()) {
+      /*  if(!ligneTransactionService.isImportCompleted()) {
             throw new ImportNotCompletedException("L'import du fichier CSV n'est pas terminé.");
-        }
+        } */
         Pdf pdf = pdfRepository.save(new Pdf());
 
         PdfLocationDto requestDto = new PdfLocationDto(longitude, latitude, rayon, pdf.getId());
@@ -54,9 +54,9 @@ public class PdfServiceImpl implements PdfService {
                 session -> session.createObjectMessage(requestDto));
 
         String path = "";
-        if(response != null){
-            path = ((TextMessage)response).getText();
-        }else{
+        if (response != null) {
+            path = ((TextMessage) response).getText();
+        } else {
             throw new PdfGeneratedException("Une erreur est survenue lors de la génération du fichier pdf");
         }
 
@@ -71,15 +71,15 @@ public class PdfServiceImpl implements PdfService {
         return pdf.getPath();
     }
 
-    private void updatePath(Long id, String newPath){
+    private void updatePath(Long id, String newPath) {
         Pdf pdf = getById(id);
         pdf.setPath(newPath);
         pdfRepository.save(pdf);
     }
 
-    private File generateFile(Collection<LigneTransaction> lignesTransactionByLocation, Long idPdf){
+    private File generateFile(Collection<LigneTransaction> lignesTransactionByLocation, Long idPdf) {
         File pdf = new File("doc\\pdf\\pdf - " + idPdf + ".pdf");
-        try{
+        try {
             Document document = new Document();
             PdfWriter pdfWriter = PdfWriter.getInstance(document, new FileOutputStream(pdf));
             document.open();
@@ -103,13 +103,13 @@ public class PdfServiceImpl implements PdfService {
             document.close();
             pdfWriter.close();
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             logger.warn(ex.getMessage());
         }
         return pdf;
     }
 
-    private void ajouterSautDeLigne(Document document)throws DocumentException{
+    private void ajouterSautDeLigne(Document document) throws DocumentException {
         Paragraph paragraph = new Paragraph(" ");
         paragraph.setSpacingBefore(20f);
         document.add(paragraph);
@@ -121,25 +121,25 @@ public class PdfServiceImpl implements PdfService {
         table.setTotalWidth(new float[]{150, 350});
 
         addCellToTable(table, "Id mutation", ligneTransaction.getIdMutation());
-        if(ligneTransaction.getDateMutation() != null)
+        if (ligneTransaction.getDateMutation() != null)
             addCellToTable(table, "Date mutation", new SimpleDateFormat("dd/MM/yyyy").format(ligneTransaction.getDateMutation()));
-        if(ligneTransaction.getNatureMutation() != null)
+        if (ligneTransaction.getNatureMutation() != null)
             addCellToTable(table, "Nature mutation", ligneTransaction.getNatureMutation());
-        if(ligneTransaction.getValeurFonciere() != null)
+        if (ligneTransaction.getValeurFonciere() != null)
             addCellToTable(table, "Valeur foncière", ligneTransaction.getValeurFonciere().toString());
-        if(ligneTransaction.getAdresse() != null)
+        if (ligneTransaction.getAdresse() != null)
             addCellToTable(table, "Adresse", ligneTransaction.getAdresse());
-        if(ligneTransaction.getIdParcelle() != null)
+        if (ligneTransaction.getIdParcelle() != null)
             addCellToTable(table, "Id parcelle", ligneTransaction.getIdParcelle());
-        if(ligneTransaction.getNombreLots() != null)
+        if (ligneTransaction.getNombreLots() != null)
             addCellToTable(table, "Nombre de lots", ligneTransaction.getNombreLots().toString());
-        if(ligneTransaction.getTypeLocal() != null)
+        if (ligneTransaction.getTypeLocal() != null)
             addCellToTable(table, "Type local", ligneTransaction.getTypeLocal());
-        if(ligneTransaction.getSurfaceReelleBati() != null)
+        if (ligneTransaction.getSurfaceReelleBati() != null)
             addCellToTable(table, "Surface réelle batiment", ligneTransaction.getSurfaceReelleBati().toString());
-        if(ligneTransaction.getNombrePiecesPrincipales() != null)
+        if (ligneTransaction.getNombrePiecesPrincipales() != null)
             addCellToTable(table, "Nbr pièces principales", ligneTransaction.getNombrePiecesPrincipales().toString());
-        if(ligneTransaction.getSurfaceTerrain() != null)
+        if (ligneTransaction.getSurfaceTerrain() != null)
             addCellToTable(table, "Surface terrain", ligneTransaction.getSurfaceTerrain().toString());
 
         return table;
@@ -148,7 +148,7 @@ public class PdfServiceImpl implements PdfService {
     private void addCellToTable(PdfPTable table, String label, String value) {
         PdfPCell labelCell = new PdfPCell(new Phrase(label));
         table.addCell(labelCell);
-        if(value != null){
+        if (value != null) {
             PdfPCell valueCell = new PdfPCell(new Phrase(value));
             table.addCell(valueCell);
         }

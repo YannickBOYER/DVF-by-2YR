@@ -22,9 +22,9 @@ public class LigneTransactionRestController {
     @GetMapping("generatePdfByLocation")
     public ResponseEntity<byte[]> generateByLocation(@RequestParam(name = "longitude", required = false) Double longitude, @RequestParam(name = "latitude", required = false) Double latitude, @RequestParam(name = "rayon", required = false) Integer rayon) throws IOException, JMSException {
         File pdf = pdfService.generateByLocation(longitude, latitude, rayon);
-        if(!pdf.exists()){
+        if (!pdf.exists()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }else{
+        } else {
             byte[] contenuPdf = Files.readAllBytes(pdf.toPath());
 
             HttpHeaders entetes = new HttpHeaders();
