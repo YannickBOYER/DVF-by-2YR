@@ -61,7 +61,6 @@ class LigneTransactionServiceIT {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> {
-                    // Effectuez des assertions sur l'exception capturée
                     assertThat(result.getResolvedException()).isInstanceOf(MissingParamException.class);
                 });
     }

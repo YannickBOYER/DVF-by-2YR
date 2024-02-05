@@ -5,7 +5,6 @@ import com.lowagie.text.pdf.*;
 import fr.esgi.dvf.business.LigneTransaction;
 import fr.esgi.dvf.business.Pdf;
 import fr.esgi.dvf.dto.PdfLocationDto;
-import fr.esgi.dvf.exception.ImportNotCompletedException;
 import fr.esgi.dvf.exception.MissingParamException;
 import fr.esgi.dvf.exception.PdfGeneratedException;
 import fr.esgi.dvf.exception.PdfNotFoundException;
@@ -44,9 +43,7 @@ public class PdfServiceImpl implements PdfService {
         if (longitude == null || latitude == null || rayon == null) {
             throw new MissingParamException("Les paramètres longitude, latitude et rayon sont obligatoires");
         }
-      /*  if(!ligneTransactionService.isImportCompleted()) {
-            throw new ImportNotCompletedException("L'import du fichier CSV n'est pas terminé.");
-        } */
+
         Pdf pdf = pdfRepository.save(new Pdf());
 
         PdfLocationDto requestDto = new PdfLocationDto(longitude, latitude, rayon, pdf.getId());
@@ -91,7 +88,8 @@ public class PdfServiceImpl implements PdfService {
             int fontSize = 12;
             Font font = new Font(bf, fontSize);
 
-            document.add(new Paragraph("Lignes Transaction DVF", font));
+            String titrePage = "Ligne Transaction DVF" + (ligneTransactionService.isImportCompleted() ? "" : " : Import partiel");
+            document.add(new Paragraph(titrePage, font));
             ajouterSautDeLigne(document);
 
             for (LigneTransaction ligneTransaction : lignesTransactionByLocation) {
