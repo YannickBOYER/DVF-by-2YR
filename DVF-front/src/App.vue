@@ -13,6 +13,15 @@ header {
   line-height: 1.5;
 }
 
+main {
+  position: absolute;
+  top:0%;
+  left:0%;
+
+  height: 100%;
+  width: 100%;
+}
+
 .logo {
   display: block;
   margin: 0 auto 2rem;

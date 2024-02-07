@@ -1,0 +1,28 @@
+name: dvf
+services:
+  minio:
+    ports:
+      - 9000:9000
+      - 9001:9001
+    container_name: minio
+    volumes:
+      - /files
+    environment:
+      - MINIO_ROOT_USER=root
+      - MINIO_ROOT_PASSWORD=rootroot
+    image: quay.io/minio/minio
+    command: server /files --console-address ":9001"
+  front:
+    build:
+      context: ./DVF-front
+    environment:
+      NODE_ENV: production
+    ports:
+      - 4173:4173
+    container_name: dvf-front
+  back:
+    build:
+      context: ./DVF
+    ports:
+      - 8080:8080
+    container_name: dvf-back
