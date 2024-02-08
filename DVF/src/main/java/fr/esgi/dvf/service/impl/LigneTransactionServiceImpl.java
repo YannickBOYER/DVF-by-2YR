@@ -1,7 +1,6 @@
 package fr.esgi.dvf.service.impl;
 
 import fr.esgi.dvf.business.LigneTransaction;
-import fr.esgi.dvf.exception.ImportNotCompletedException;
 import fr.esgi.dvf.repository.LigneTransactionRepository;
 import fr.esgi.dvf.service.LigneTransactionService;
 import org.apache.logging.log4j.LogManager;
@@ -18,15 +17,12 @@ import java.io.*;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 import java.util.Map;
 
 @Service
 public class LigneTransactionServiceImpl implements LigneTransactionService {
-
     private final Logger logger = LogManager.getLogger(LigneTransactionServiceImpl.class);
-
     private LigneTransactionRepository ligneTransactionRepository;
     private CSVParser csvParser;
     private int nbrLigneIgnoree;
@@ -41,7 +37,6 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
     @Value("${csvCompresedFileUrlPath}")
     private String csvCompresedFileUrlPath;
 
-
     public LigneTransactionServiceImpl(LigneTransactionRepository ligneTransactionRepository) {
         this.ligneTransactionRepository = ligneTransactionRepository;
     }
@@ -52,7 +47,7 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
             downloadAndDecompressGzip();
             this.csvParser = getCSVParser(localFilePath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e);
         }
     }
 
@@ -67,10 +62,6 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
 
     @Override
     public Map<String, LigneTransaction> findAllByLocation(Double longitude, Double latitude, Integer rayon) {
-        /*if (!isImportCompleted) {
-            throw new ImportNotCompletedException("L'import du fichier CSV n'est pas terminé.");
-        }*/
-
         Map<String, LigneTransaction> ligneTransactionMap = new HashMap<>();
         int i = 0;
         double result;
@@ -106,11 +97,11 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
 
     @Scheduled(cron = "*/10 * * * * *")
     //@Scheduled(cron = "0 */5 * * * *")
-    public void importSheduled() throws Exception {
+    public void importSheduled() throws ParseException, IOException {
         importByNbrInterval(nbrIntervalLigneParImport);
     }
 
-    public void importByNbrInterval(int nbrIntervalLigne) throws Exception {
+    public void importByNbrInterval(int nbrIntervalLigne) throws ParseException, IOException {
         if (!isImportCompleted) {
             if (csvParser.iterator().hasNext()) {
                 for (int i = 0; i < nbrIntervalLigne; i++) {
@@ -173,9 +164,5 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
                 out.write(buffer, 0, bytesRead);
             }
         }
-    }
-
-    public int getNbrIntervalLigneParImport() {
-        return nbrIntervalLigneParImport;
     }
 }

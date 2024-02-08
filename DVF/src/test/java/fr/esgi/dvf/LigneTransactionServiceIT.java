@@ -1,18 +1,14 @@
 package fr.esgi.dvf;
 
 import fr.esgi.dvf.exception.MissingParamException;
-import fr.esgi.dvf.repository.LigneTransactionRepository;
 import fr.esgi.dvf.service.impl.LigneTransactionServiceImpl;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -40,7 +36,7 @@ class LigneTransactionServiceIT {
 
     @Test
     @Order(1)
-    public void shouldImportFileSuccessfully() throws Exception {
+    void shouldImportFileSuccessfully() throws Exception {
         assertNotNull(ligneTransactionService);
         ligneTransactionService.importSheduled();
         String longitude = "4.848466";

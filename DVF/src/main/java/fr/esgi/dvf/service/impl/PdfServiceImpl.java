@@ -9,6 +9,7 @@ import fr.esgi.dvf.exception.MissingParamException;
 import fr.esgi.dvf.exception.PdfGeneratedException;
 import fr.esgi.dvf.exception.PdfNotFoundException;
 import fr.esgi.dvf.repository.PdfRepository;
+import fr.esgi.dvf.service.FileServerService;
 import fr.esgi.dvf.service.LigneTransactionService;
 import fr.esgi.dvf.service.PdfService;
 import jakarta.jms.JMSException;
@@ -33,6 +34,7 @@ public class PdfServiceImpl implements PdfService {
     private PdfRepository pdfRepository;
     private LigneTransactionService ligneTransactionService;
     private JmsTemplate jmsTemplate;
+    private FileServerService fileServerService;
 
     private Pdf getById(Long id) {
         return pdfRepository.findById(id).orElseThrow(() -> new PdfNotFoundException("Pdf non trouvé"));
@@ -64,7 +66,8 @@ public class PdfServiceImpl implements PdfService {
     public String generer(PdfLocationDto pdfLocationDto) {
         Map<String, LigneTransaction> lignesTransactionByLocation = ligneTransactionService.findAllByLocation(pdfLocationDto.longitude, pdfLocationDto.latitude, pdfLocationDto.rayon);
         File pdf = this.generateFile(lignesTransactionByLocation.values(), pdfLocationDto.idPdf);
-        updatePath(pdfLocationDto.idPdf, pdf.getPath());
+        String pathOnFileServer = fileServerService.enregistrerFichier(pdf);
+        updatePath(pdfLocationDto.idPdf, pathOnFileServer);
         return pdf.getPath();
     }
 
