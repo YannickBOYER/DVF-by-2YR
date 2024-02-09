@@ -95,16 +95,10 @@ public class LigneTransactionServiceImpl implements LigneTransactionService {
         return value * Math.PI / 180;
     }
 
-    @Scheduled(cron = "*/10 * * * * *")
-    //@Scheduled(cron = "0 */5 * * * *")
-    public void importSheduled() throws ParseException, IOException {
-        importByNbrInterval(nbrIntervalLigneParImport);
-    }
-
-    public void importByNbrInterval(int nbrIntervalLigne) throws ParseException, IOException {
+    public void importer() throws ParseException, IOException {
         if (!isImportCompleted) {
             if (csvParser.iterator().hasNext()) {
-                for (int i = 0; i < nbrIntervalLigne; i++) {
+                for (int i = 0; i < nbrIntervalLigneParImport; i++) {
                     if (csvParser.iterator().hasNext()) {
                         CSVRecord csvRecord = csvParser.iterator().next();
                         importerLigneTransactionByCSVRecord(csvRecord);

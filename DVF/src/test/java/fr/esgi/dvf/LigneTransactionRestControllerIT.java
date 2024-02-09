@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestPropertySource(locations = "classpath:applicationTest.properties")
-class LigneTransactionServiceIT {
+class LigneTransactionRestControllerIT {
 
     @Autowired
     private LigneTransactionServiceImpl ligneTransactionService;
@@ -36,9 +36,9 @@ class LigneTransactionServiceIT {
 
     @Test
     @Order(1)
-    void shouldImportFileSuccessfully() throws Exception {
+    void shouldReturnPdfFileSuccessfully() throws Exception {
         assertNotNull(ligneTransactionService);
-        ligneTransactionService.importSheduled();
+        ligneTransactionService.importer();
         String longitude = "4.848466";
         String latitude = "45.754752";
         String rayon = "100";
