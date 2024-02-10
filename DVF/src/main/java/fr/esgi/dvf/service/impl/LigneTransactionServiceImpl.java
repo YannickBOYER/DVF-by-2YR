@@ -10,7 +10,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -23,7 +22,7 @@ import java.util.Map;
 @Service
 public class LigneTransactionServiceImpl implements LigneTransactionService {
     private final Logger logger = LogManager.getLogger(LigneTransactionServiceImpl.class);
-    private LigneTransactionRepository ligneTransactionRepository;
+    private final LigneTransactionRepository ligneTransactionRepository;
     private CSVParser csvParser;
     private int nbrLigneIgnoree;
     private boolean isImportCompleted = false;

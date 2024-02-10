@@ -13,8 +13,9 @@ import java.text.ParseException;
 public class LigneTransactionImportAutomate {
     LigneTransactionService ligneTransactionService;
 
-    @Scheduled(cron = "*/10 * * * * *")
-    //@Scheduled(cron = "0 */5 * * * *")
+    // Schedule réglé a 10 secondes lors du developpement
+    //@Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void importScheduled() throws ParseException, IOException {
         ligneTransactionService.importer();
     }
