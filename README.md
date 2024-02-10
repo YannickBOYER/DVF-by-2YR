@@ -5,6 +5,7 @@ Pour cela, nous récupérons un [CSV](https://files.data.gouv.fr/geo-dvf/latest/
 Nous mettons ensuite à disposition une page Web permettant de choisir une zone.
 Le backend avec l'API sont développés en Java.
 Le PDF retourné par l'API sera affiché sur l'écran de l'utilisateur et automatiquement téléchargé.
+Ce PDF sera aussi enregistré sur un serveur de fichiers afin de pouvoir être récupéré plus tard si besoin.
 
 ## Architecture
 
@@ -29,5 +30,5 @@ Cette commande va démarrer le frontend, le backend et le serveur de fichiers. \
 
 Backend : http://localhost:8080 \
 Frontend : http://localhost:4173 \
-Serveur de fichier (MinIO) : http://localhost:9001 (Login : root, Password : rootroot)
+Fileserver (MinIO) : http://localhost:9001 (login : root, password : rootroot)
 
