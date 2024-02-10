@@ -22,7 +22,7 @@ Les documents se trouvent dans le dossier DVF\doc du projet. \
 #### Démarrage
 Afin de lancer le projet, merci de suivre ces instructions:
 ```bash
-DVF-by-2YR/> docker-compose up
+DVF-by-2YR> docker-compose up
 ```
 Cette commande va démarrer le frontend, le backend et le serveur de fichiers. \
 
